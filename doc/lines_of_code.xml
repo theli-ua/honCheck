@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="loc.xsl"?><results>
+<header>
+  <cloc_url>http://cloc.sourceforge.net</cloc_url>
+  <cloc_version>1.55</cloc_version>
+  <elapsed_seconds>0.5</elapsed_seconds>
+  <n_files>7</n_files>
+  <n_lines>455</n_lines>
+  <files_per_second>14</files_per_second>
+  <lines_per_second>910</lines_per_second>
+  <report_file>doc/lines_of_code.xml</report_file>
+</header>
+<languages>
+  <language name="C++" files_count="4" blank="49" comment="50" code="235" />
+  <language name="C/C++ Header" files_count="3" blank="13" comment="44" code="64" />
+  <total sum_files="7" blank="62" comment="94" code="299" />
+</languages>
+</results>

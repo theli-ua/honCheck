@@ -43,4 +43,4 @@ doc: Doxyfile $(CFILES) $(CPPFILES) $(HFILES)
 	$(ECHO) "-> html documentation in \`doc/html'"
 
 loc: $(CFILES) $(CPPFILES) $(HFILES)
-	cloc $(INCLUDES) $(SOURCES) --xsl loc.xsl --out doc/lines_of_code.xml
+	cloc $(INCLUDES) $(SOURCES) --xsl loc.xsl --out doc/lines_of_code.xml --exclude-list-file=reused_code

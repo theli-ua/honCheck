@@ -2,7 +2,8 @@
 #include <libxml/tree.h>
 #include <libxml/xmlstring.h>
 #include "logger.h"
-#include <cstring>
+#include <sstream>
+#include <ios>
 #include "manifest.h"
 
 Manifest::Manifest()
@@ -14,25 +15,11 @@ Manifest::~Manifest()
     xmlCleanupParser();
 }
 
-/**
- * @brief Parse XML Manifest from file
- *
- * @param path - path to manifest.xml file
- *
- * @return 0 - succes, nonzero - error
- */
 int Manifest::Parse(std::string const& path)
 {
     return Parse(path.c_str());
 }
 
-/**
- * @brief Parse XML Manifest from file
- *
- * @param path - path to manifest.xml file
- *
- * @return 0 - succes, nonzero - error
- */
 int Manifest::Parse(const char* path)
 {
     xmlDoc *doc = NULL;
@@ -54,6 +41,33 @@ int Manifest::Parse(const char* path)
         xmlFreeDoc(doc);
         return -1;
     }
+    version.assign(reinterpret_cast<const char*>(xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("version"))));
+    if ( version == "" )
+    {
+        logger.error(0) << "manifest tag is missing version attribute" << logger.end;
+    }
+    else
+    {
+        logger.verbose(0) << "manifest version: " << version << logger.end;
+    }
+    os.assign(reinterpret_cast<const char*>(xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("os"))));
+    if ( version == "" )
+    {
+        logger.error(0) << "manifest tag is missing os attribute" << logger.end;
+    }
+    else
+    {
+        logger.verbose(0) << "manifest os: " << os << logger.end;
+    }
+    arch.assign(reinterpret_cast<const char*>(xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("arch"))));
+    if ( version == "" )
+    {
+        logger.error(0) << "manifest tag is missing arch attribute" << logger.end;
+    }
+    else
+    {
+        logger.verbose(0) << "manifest arch: " << arch << logger.end;
+    }
     for (xmlNode *cur_node = root_element->children; cur_node; cur_node = cur_node->next) {
         if (cur_node->type == XML_ELEMENT_NODE) {
             if (!xmlStrEqual(cur_node->name, reinterpret_cast<const xmlChar*>("file")))
@@ -62,6 +76,7 @@ int Manifest::Parse(const char* path)
             }
             else
             {
+                entries.push_back(Entry(cur_node));
             }
         }
     }
@@ -70,21 +85,81 @@ int Manifest::Parse(const char* path)
     return 0;
 }
 
-Manifest::Entry::Entry(xmlNode* node)
+std::vector<Manifest::Entry>::size_type Manifest::size()
 {
+    return entries.size();
 }
 
-std::string const& Manifest::Entry::path()
+Manifest::Entry::Entry(xmlNode* node)
+{
+	Logger& logger = Logger::get_instance();
+
+    _path.assign(reinterpret_cast<const char*>(xmlGetProp(node,
+                    reinterpret_cast<const xmlChar*>("path"))));
+    if (_path == "")
+    {
+        logger.error(0) << "Node is missing path attribute" << logger.end;
+    }
+    else
+    {
+        logger.trace(0) << "Node path: " << _path << logger.end;
+    }
+
+
+    {
+        std::stringstream ss;
+        ss << std::hex << reinterpret_cast<const char*>(xmlGetProp(node,
+                    reinterpret_cast<const xmlChar*>("checksum")));
+        ss >> _checksum;
+    }
+
+    if(_checksum == 0)
+    {
+        logger.error(0) << "Node is missing checksum attribute (";
+        logger.error(0) << _path << ")" << logger.end;
+    }
+    else
+    {
+        logger.trace(0) << "Node checksum: " << _checksum << logger.end;
+    }
+
+    {
+        std::stringstream ss;
+        ss << reinterpret_cast<const char*>(xmlGetProp(node,
+                    reinterpret_cast<const xmlChar*>("size")));
+        ss >> _size;
+    }
+
+
+    if(_size == 0)
+    {
+        logger.error(0) << "Node is missing size attribute (";
+        logger.error(0) << _path << ")" << logger.end;
+    }
+    else
+    {
+        logger.trace(0) << "Node size: " << _size << logger.end;
+    }
+
+
+}
+
+std::string const& Manifest::Entry::path() const
 {
     return _path;
 }
 
-unsigned long Manifest::Entry::size()
+unsigned long Manifest::Entry::size() const
 {
     return _size;
 }
 
-unsigned long Manifest::Entry::checksum()
+unsigned long Manifest::Entry::checksum() const
 {
     return _checksum;
+}
+
+Manifest::Entry const& Manifest::operator[](int i)const
+{
+    return entries[i];
 }

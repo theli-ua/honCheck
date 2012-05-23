@@ -11,9 +11,12 @@
 #include "ansi_colors.h"
 
 #include "manifest.h"
+#include "checker.h"
+#include "resreader.h"
+
+#include "crcchecker.h"
 
 namespace TC = TermAnsiColor;
-
 
 // Not optimal, but ok for a small vector such as args list (otherwise id sort
 // and use binary_search
@@ -23,11 +26,20 @@ template <typename T> bool contains( const std::vector<T>& a, const T& b ) {
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> args(argv + 1/* skip binary name */, argv + argc);
+    std::vector<std::string> args(argv + 1/* skip binary name */, 
+            argv + argc /* this is an invalid address but works as a valid end for this case */);
 
     std::ostream verbose(std::cout.rdbuf());
 	std::ostream error(std::cerr.rdbuf());
 	std::ostream trace(std::cout.rdbuf());
+
+    std::vector<IChecker*> checkers;
+
+    /* Add checker classes here */
+
+    checkers.push_back(new CRCChecker());
+
+    /* Stop adding checker classes */
 
 
 	Logger& logger = Logger::get_instance();
@@ -41,12 +53,19 @@ int main(int argc, char** argv)
 
     if (contains(args,std::string("--help")))
     {
-        logger.error(0) << "options: " << logger.end;
+        logger.error(0) << "Options: " << logger.end;
         logger.error(0) << "\t--help\t\tthis message" << logger.end;
         logger.error(0) << "\t--verbose\tverbose output" << logger.end;
-        //logger.error(0) << "\t--trace\t\ttrace output" << logger.end;
-        //unused ^^
-        logger.error(0) << "\t--dir <dir>\tdirectory to read manifest/files from" << logger.end;
+        logger.error(0) << "\t--trace\t\ttrace output (slows down execution a lot)" << logger.end;
+        logger.error(0) << "\t--dir <dir>\tdirectory to read manifest/files from(default is current directory)" << logger.end;
+        logger.error(0) << "Checkers' switches:" << logger.end;
+        for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                ++it)
+        {
+            IChecker const& checker = **it;
+            logger.error(0) << "\t" << checker.cmdOption() << "\tdisable ";
+            logger.error(0) << checker.name() << logger.end;
+        }
         return 0;
     }
     std::vector<std::string>::iterator it = std::find(args.begin(),args.end(),std::string("--dir"));
@@ -61,6 +80,33 @@ int main(int argc, char** argv)
         }
     }
 
+    for(int i = 0 ; i < checkers.size() ; ++i)
+    {
+        if(contains(args,checkers[i]->cmdOption()))
+        {
+            delete(checkers[i]);
+            checkers.erase(checkers.begin() + i--);
+        }
+        else
+        {
+            checkers[i]->Initialise();
+        }
+    }
+
+    logger.verbose(0) << "Enabled checkers:" << logger.end;
+    if(checkers.empty())
+    {
+        logger.verbose(0) << "\tNone" << logger.end;
+    }
+    else
+    {
+        for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                ++it)
+        {
+            logger.verbose(0) << "\t" << (*it)->name() << logger.end;
+        }
+    }
+
     Manifest manifest;
 
     if (0 != manifest.Parse("manifest.xml"))
@@ -69,13 +115,35 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    logger.verbose(0) << "Total entries in manifest: " << manifest.size() << logger.end;
+
+    ResourceReader resReader;
+
+    int errCount = 0;
+
+    for(int i = 0; i < manifest.size() ; ++i)
+    {
+        Manifest::Entry const& entry = manifest[i];
+
+        std::string data = resReader.Read(entry);
+        
+        for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                ++it)
+        {
+            if((*it)->Match(entry) && (*it)->Check(entry,data) != 0)
+            {
+                logger.error(0) << (*it)->name() << " returned error for" << logger.end;
+                logger.error(0) << "\t" << entry.path() << logger.end;
+                errCount++;
+            }
+        }
+    }
 
 
-
-
-
-	//logger.set_verbose(verbose, opt.progress ? 2 : 0);
-	//logger.set_error(error, opt.progress ? 2 : (opt.very_verbose ? -2 : 0));
-	//logger.set_trace(trace);
-    
+    for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+            ++it)
+    {
+        delete(*it);
+    }
+    return errCount;
 }
