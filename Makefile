@@ -7,13 +7,14 @@ TARGET 		:= 	honCheck
 
 
 CFLAGS		:=	-I$(INCLUDES) $(shell xml2-config --cflags)
+CFLAGS		+= $(shell pkg-config minizip --cflags)
 CXXFLAGS	:=	$(CFLAGS)
 
 DOXYGEN		:=	doxygen
 ECHO		:=	echo
 
 LDFLAGS		:= 
-LIBS		:=	$(shell xml2-config --libs)
+LIBS		:=	$(shell xml2-config --libs) $(shell pkg-config --libs minizip)
 
 CFILES		:=	$(wildcard $(SOURCES)/*.c)
 CPPFILES	:=	$(wildcard $(SOURCES)/*.cpp)
