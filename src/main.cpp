@@ -131,18 +131,27 @@ int main(int argc, char** argv)
     {
         Manifest::Entry const& entry = manifest[i];
 
-        std::vector<char> data = resReader.Read(entry);
+        std::vector<char> data;
+        bool read = false;
         
         for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
                 ++it)
         {
-            if((*it)->Match(entry) && (*it)->Check(entry,data) != 0)
+            if((*it)->Match(entry))
             {
-                //logger.error(0) << logger.end;
-                logger.error(0) << (*it)->name() << " returned error for" << logger.end;
-                logger.error(0) << "\t" << entry.path() << logger.end;
+                if(!read)
+                {
+                    data = resReader.Read(entry);
+                    read = true;
+                }
+                if ((*it)->Check(entry,data) != 0)
+                {
+                    //logger.error(0) << logger.end;
+                    logger.error(0) << (*it)->name() << " returned error for" << logger.end;
+                    logger.error(0) << "\t" << entry.path() << logger.end;
 #pragma omp atomic
-                errCount++;
+                    errCount++;
+                }
             }
         }
 #pragma omp atomic

@@ -2,6 +2,7 @@
 #define _SHADERCHECKER_H
 #include "checker.h"
 #include "manifest.h"
+#include <vector>
 
 class ShaderChecker: public IChecker
 {
@@ -19,8 +20,8 @@ class ShaderChecker: public IChecker
      */
     virtual int Compile(const char** strings,int stringCount) const = 0;
     /**
-     * @brief array of defines
+     * @brief array of defines' product
      */
-    char*** _defines;
+    std::vector<std::vector<const char*> > _defines;
 };
 #endif

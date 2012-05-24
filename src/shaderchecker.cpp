@@ -1,27 +1,20 @@
 #include "shaderchecker.h"
 #include "logger.h"
+#include <algorithm>
 
 
 int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& data) const
 {
-    /* we will generate a cartesian product of all possible define combinations
-     * and try to compile with each */
 	Logger& logger = Logger::get_instance();
 
-    char*** p = _defines;
-    while(*p != 0)
+    int size = _defines.size();
+    int result = 0;
+    const char** strings = new const char*[size + 1];
+    strings[size] = &data[0];
+    for(int i = 0 ; i < size && result == 0; ++i)
     {
-        char** p2 = *p;
-        while(*p2 != 0)
-        {
-            logger.error(0) << *p2 << " ";
-            p2++;
-        }
-        logger.error(0) << logger.end;
-        p++;
+        std::copy(_defines[i].begin(),_defines[i].end(),strings);
+        result = Compile(strings,size + 1);
     }
-
-
-    const char* aaa[] = {&data[0]};
-    return Compile(aaa,1);
+    return result;
 }
