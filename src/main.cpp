@@ -126,7 +126,8 @@ int main(int argc, char** argv)
 
     int processed = 0;
     
-#pragma omp parallel for
+#pragma omp parallel for private(resReader) firstprivate(manifest,checkers,size) schedule(dynamic) default(none)\
+    shared(errCount,processed,logger)
     for(int i = 0; i < size ; ++i)
     {
         Manifest::Entry const& entry = manifest[i];
@@ -146,7 +147,6 @@ int main(int argc, char** argv)
                 }
                 if ((*it)->Check(entry,data) != 0)
                 {
-                    //logger.error(0) << logger.end;
                     logger.error(0) << (*it)->name() << " returned error for" << logger.end;
                     logger.error(0) << "\t" << entry.path() << logger.end;
 #pragma omp atomic
