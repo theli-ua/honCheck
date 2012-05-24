@@ -58,6 +58,7 @@ public:
 
     /* finish formatting string for output */
     inline static Logger::Stream& end(Logger::Stream& s);
+    inline static Logger::Stream& rend(Logger::Stream& s);
 
 private:
     Logger(); // this is a singleton
@@ -143,6 +144,14 @@ inline Logger::Stream& Logger::end(Logger::Stream& s)
     s << TC::DEFAULT;
     if (s._current_output)
         *s._current_output << s.str() << std::endl;
+    s.clear();
+    return s;
+}
+inline Logger::Stream& Logger::rend(Logger::Stream& s)
+{
+    s << TC::DEFAULT;
+    if (s._current_output)
+        *s._current_output << s.str() << '\r';
     s.clear();
     return s;
 }

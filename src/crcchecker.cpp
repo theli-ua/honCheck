@@ -1,4 +1,5 @@
 #include "crcchecker.h"
+#include <zlib.h>
 
 std::string const& CRCChecker::cmdOption() const
 {
@@ -12,15 +13,20 @@ std::string const& CRCChecker::name() const
 }
 std::string const& CRCChecker::reString() const
 {
-    static std::string cmd = ".*so";
+    static std::string cmd = ".*";
     return cmd;
 }
-int CRCChecker::Check(Manifest::Entry const& entry, std::string const& data) const
+int CRCChecker::Check(Manifest::Entry const& entry, std::vector<char> const& data) const
 {
-    printf("%s\n",entry.path().c_str());
-    if (entry.checksum() == 0 || entry.size() != data.size())
+    if (entry.checksum() == 0 && entry.size() == 0)
     {
-        return 1;
+        return 0;
     }
+    else
+    {
+        if (entry.checksum() != crc32(0,reinterpret_cast<const Bytef*>(&data[0]),data.size()))
+            return 1;
+    }
+
     return 0;
 }

@@ -115,7 +115,7 @@ Manifest::Entry::Entry(xmlNode* node)
 
     if(_checksum == 0)
     {
-        logger.error(0) << "Node is missing checksum attribute (";
+        logger.error(0) << "Node has missing or zeroed checksum attribute (";
         logger.error(0) << _path << ")" << logger.end;
     }
     else
@@ -131,15 +131,15 @@ Manifest::Entry::Entry(xmlNode* node)
     }
 
 
-    if(_size == 0)
-    {
-        logger.error(0) << "Node is missing size attribute (";
-        logger.error(0) << _path << ")" << logger.end;
-    }
-    else
-    {
-        logger.trace(0) << "Node size: " << _size << logger.end;
-    }
+    //if(_size == 0)
+    //{
+        //logger.error(0) << "Node is missing size attribute (";
+        //logger.error(0) << _path << ")" << logger.end;
+    //}
+    //else
+    //{
+        //logger.trace(0) << "Node size: " << _size << logger.end;
+    //}
 
 
 }

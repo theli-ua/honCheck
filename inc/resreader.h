@@ -1,10 +1,14 @@
 #ifndef _RESREADER_H
 #define _RESREADER_H
 #include "manifest.h"
+#include "unzip.h"
+#include <map>
 
 class ResourceReader
 {
     public:
+    ResourceReader();
+    ~ResourceReader();
     /**
      * @brief Read entry's data and return it
      *
@@ -12,6 +16,8 @@ class ResourceReader
      *
      * @return entry's data in a std::string buffer
      */
-    std::string Read(Manifest::Entry entry);
+    std::vector<char> Read(Manifest::Entry entry);
+    private:
+    std::map<std::string,unzFile> zipFiles;
 };
 #endif

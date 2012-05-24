@@ -8,7 +8,7 @@ class CRCChecker : public IChecker
     std::string const& cmdOption() const;
     std::string const& name() const;
     std::string const& reString() const;
-    int Check(Manifest::Entry const& entry, std::string const& data) const;
+    int Check(Manifest::Entry const& entry, std::vector<char> const& data) const;
 
 };
 #endif

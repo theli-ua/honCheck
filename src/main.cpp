@@ -15,6 +15,7 @@
 #include "resreader.h"
 
 #include "crcchecker.h"
+#include "glslchecker.h"
 
 namespace TC = TermAnsiColor;
 
@@ -35,13 +36,6 @@ int main(int argc, char** argv)
 
     std::vector<IChecker*> checkers;
 
-    /* Add checker classes here */
-
-    checkers.push_back(new CRCChecker());
-
-    /* Stop adding checker classes */
-
-
 	Logger& logger = Logger::get_instance();
     logger.set_error(error, 0);
 
@@ -50,6 +44,13 @@ int main(int argc, char** argv)
     if (contains(args,std::string("--trace")))
         logger.set_trace(trace);
 
+    /* Add checker classes here */
+
+    checkers.push_back(new CRCChecker());
+    checkers.push_back(new GLSLVSChecker());
+    checkers.push_back(new GLSLPSChecker());
+
+    /* Stop adding checker classes */
 
     if (contains(args,std::string("--help")))
     {
@@ -121,23 +122,37 @@ int main(int argc, char** argv)
 
     int errCount = 0;
 
-    for(int i = 0; i < manifest.size() ; ++i)
+    int size = manifest.size();
+
+    int processed = 0;
+    
+#pragma omp parallel for
+    for(int i = 0; i < size ; ++i)
     {
         Manifest::Entry const& entry = manifest[i];
 
-        std::string data = resReader.Read(entry);
+        std::vector<char> data = resReader.Read(entry);
         
         for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
                 ++it)
         {
             if((*it)->Match(entry) && (*it)->Check(entry,data) != 0)
             {
+                //logger.error(0) << logger.end;
                 logger.error(0) << (*it)->name() << " returned error for" << logger.end;
                 logger.error(0) << "\t" << entry.path() << logger.end;
+#pragma omp atomic
                 errCount++;
             }
         }
+#pragma omp atomic
+        processed++;
+        logger.verbose(0) << "Processed: " << processed << "/" << size << logger.rend;
     }
+    logger.verbose(0) << logger.end;
+
+
+    logger.error(0) << "Total errors: " << errCount << logger.end;
 
 
     for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();

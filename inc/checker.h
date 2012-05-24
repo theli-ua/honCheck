@@ -54,7 +54,7 @@ class IChecker
      *
      * @return 0 if data is correct, non-zero otherwise
      */
-    virtual int Check(Manifest::Entry const& entry, std::string const& data) const = 0;
+    virtual int Check(Manifest::Entry const& entry, std::vector<char> const& data) const = 0;
 
     private:
     xmlRegexpPtr comp;
