@@ -10,7 +10,12 @@ namespace TermAnsiColor
 {
 
 // enabling or disabling coloring
-static bool no_color __attribute__((unused)) = false;
+static bool no_color 
+#ifndef _WIN32
+ __attribute__((unused)) = false;
+#else
+ = true;
+#endif
 
 // represents term color, can output to std::ostream or using as std::string
 class AnsiColor

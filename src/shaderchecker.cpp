@@ -3,18 +3,26 @@
 #include <algorithm>
 
 
-int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& data) const
+int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& bdata) const
 {
-	Logger& logger = Logger::get_instance();
+	int result = 0;
 
-    int size = _defines.size();
-    int result = 0;
-    const char** strings = new const char*[size + 1];
-    strings[size] = &data[0];
-    for(int i = 0 ; i < size && result == 0; ++i)
-    {
-        std::copy(_defines[i].begin(),_defines[i].end(),strings);
-        result = Compile(strings,size + 1);
-    }
-    return result;
+	if(_defines.size() > 0)
+	{
+		int size = _defines[0].size();
+
+		std::string data;
+		data.assign(bdata.begin(),bdata.end());
+		data.insert(0,_prologue);
+
+		const char** strings = new const char*[size + 1];
+		strings[size] = data.c_str();
+		for(int i = 0 ; i < _defines.size(); ++i)
+		{
+			std::copy(_defines[i].begin(),_defines[i].end(),&strings[0]);
+			result += Compile(strings,size + 1);
+		}
+		delete[] strings;
+	}
+	return result;
 }

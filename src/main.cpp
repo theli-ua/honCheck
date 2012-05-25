@@ -5,7 +5,11 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#ifdef _WIN32
+#include <direct.h>
+#else
 #include <unistd.h>
+#endif
 
 #include "logger.h"
 #include "ansi_colors.h"
