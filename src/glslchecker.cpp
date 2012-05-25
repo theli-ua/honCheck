@@ -128,7 +128,6 @@ std::string const& GLSLChecker::name() const
 
 GLSLChecker::GLSLChecker(): ShaderChecker()
 {
-	_prologue = ("#version 120\n\n");
 	Logger& logger = Logger::get_instance();
 	if(!openGLcontextInitialized)
 	{

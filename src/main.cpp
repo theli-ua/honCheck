@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 
     int processed = 0;
     
-#pragma omp parallel for private(resReader) firstprivate(manifest,checkers,size) schedule(dynamic) default(none)\
+#pragma omp parallel for private(resReader) firstprivate(manifest,checkers,size) schedule(dynamic)\
     shared(errCount,processed,logger)
     for(int i = 0; i < size ; ++i)
     {

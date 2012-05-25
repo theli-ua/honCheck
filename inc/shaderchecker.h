@@ -23,6 +23,5 @@ class ShaderChecker: public IChecker
      * @brief array of defines' product
      */
     std::vector<std::vector<const char*> > _defines;
-	std::string _prologue;
 };
 #endif

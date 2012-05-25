@@ -13,7 +13,6 @@ int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& 
 
 		std::string data;
 		data.assign(bdata.begin(),bdata.end());
-		data.insert(0,_prologue);
 
 		const char** strings = new const char*[size + 1];
 		strings[size] = data.c_str();

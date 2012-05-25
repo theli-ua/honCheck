@@ -15,7 +15,7 @@ class GLSLChecker : public ShaderChecker
     std::string const& name() const;
     protected:
     GLuint type;
-	int Compile(const char** strings,int stringCount) const;
+    int Compile(const char** strings,int stringCount) const;
 };
 
 class GLSLVSChecker : public GLSLChecker

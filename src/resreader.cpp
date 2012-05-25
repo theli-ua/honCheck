@@ -59,7 +59,6 @@ std::vector<char> ResourceReader::Read(Manifest::Entry entry)
         }
     }
     else //s2z
-#pragma omp critical (zip)
     {
         if(zipFiles.find(pathElements[0]) == zipFiles.end())
         {
