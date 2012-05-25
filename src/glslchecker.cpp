@@ -147,151 +147,151 @@ std::string const& GLSLChecker::name() const
 
 GLSLChecker::GLSLChecker(): ShaderChecker()
 {
-	Logger& logger = Logger::get_instance();
-	if(!openGLcontextInitialized)
-	{
+    Logger& logger = Logger::get_instance();
+    if(!openGLcontextInitialized)
+    {
 #ifdef _WIN32
-	const unsigned char INPUT_UP = 0, INPUT_DOWN = 1, INPUT_PRESSED = 2;
-	
-static const char GLWINDOW_CLASS_NAME[] = "GLWindow_class";
+        const unsigned char INPUT_UP = 0, INPUT_DOWN = 1, INPUT_PRESSED = 2;
 
-static HINSTANCE g_hInstance = NULL;
-static HWND      g_hWnd      = NULL;
-static HDC       g_hDC       = NULL;
-static HGLRC     g_hRC       = NULL;
+        static const char GLWINDOW_CLASS_NAME[] = "GLWindow_class";
 
-	int width = 800;
-	int height = 600;
-	const char* title = "honCheck";
-	WNDCLASSEX            wcx;
-	PIXELFORMATDESCRIPTOR pfd;
-	RECT                  rect;
-	HGLRC                 hRCTemp;
-	DWORD                 style, exStyle;
-	int                   x, y, format;
+        static HINSTANCE g_hInstance = NULL;
+        static HWND      g_hWnd      = NULL;
+        static HDC       g_hDC       = NULL;
+        static HGLRC     g_hRC       = NULL;
+
+        int width = 800;
+        int height = 600;
+        const char* title = "honCheck";
+        WNDCLASSEX            wcx;
+        PIXELFORMATDESCRIPTOR pfd;
+        RECT                  rect;
+        HGLRC                 hRCTemp;
+        DWORD                 style, exStyle;
+        int                   x, y, format;
 
 
-	int attribs[] =
-	{
-		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-		WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-		WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-		WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-		0
-	};
+        int attribs[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+            WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0
+        };
 
-	g_hInstance = (HINSTANCE)GetModuleHandle(NULL);
+        g_hInstance = (HINSTANCE)GetModuleHandle(NULL);
 
-	memset(&wcx, 0, sizeof(wcx));
-	wcx.cbSize        = sizeof(wcx);
-	wcx.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wcx.lpfnWndProc   = (WNDPROC)DefWindowProc;
-	wcx.hInstance     = g_hInstance;
-	wcx.lpszClassName = GLWINDOW_CLASS_NAME;
-	wcx.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
-	wcx.hCursor       = LoadCursor(NULL, IDC_ARROW);
+        memset(&wcx, 0, sizeof(wcx));
+        wcx.cbSize        = sizeof(wcx);
+        wcx.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+        wcx.lpfnWndProc   = (WNDPROC)DefWindowProc;
+        wcx.hInstance     = g_hInstance;
+        wcx.lpszClassName = GLWINDOW_CLASS_NAME;
+        wcx.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+        wcx.hCursor       = LoadCursor(NULL, IDC_ARROW);
 
-	if (!RegisterClassEx(&wcx))
-	{
-		logger.error(0) << "RegisterClassEx fail " << GetLastError() << logger.end;
-		return;
-	}
+        if (!RegisterClassEx(&wcx))
+        {
+            logger.error(0) << "RegisterClassEx fail " << GetLastError() << logger.end;
+            return;
+        }
 
-	style   = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-	exStyle = WS_EX_APPWINDOW;
+        style   = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+        exStyle = WS_EX_APPWINDOW;
 
-	x = (GetSystemMetrics(SM_CXSCREEN) - width)  / 2;
-	y = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+        x = (GetSystemMetrics(SM_CXSCREEN) - width)  / 2;
+        y = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
-	rect.left   = x;
-	rect.right  = x + width;
-	rect.top    = y;
-	rect.bottom = y + height;
+        rect.left   = x;
+        rect.right  = x + width;
+        rect.top    = y;
+        rect.bottom = y + height;
 
-	AdjustWindowRectEx (&rect, style, FALSE, exStyle);
+        AdjustWindowRectEx (&rect, style, FALSE, exStyle);
 
-	g_hWnd = CreateWindowEx(exStyle, GLWINDOW_CLASS_NAME, title, style, rect.left, rect.top,
-		rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, g_hInstance, NULL);
+        g_hWnd = CreateWindowEx(exStyle, GLWINDOW_CLASS_NAME, title, style, rect.left, rect.top,
+                rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, g_hInstance, NULL);
 
-	if (!g_hWnd)
-	{
-		logger.error(0) << "CreateWindowEx fail " << GetLastError() << logger.end;
-		return;
-	}
+        if (!g_hWnd)
+        {
+            logger.error(0) << "CreateWindowEx fail " << GetLastError() << logger.end;
+            return;
+        }
 
-	g_hDC = GetDC(g_hWnd);
+        g_hDC = GetDC(g_hWnd);
 
-	if (!g_hDC)
-	{
-		logger.error(0) << "GetDC fail " << GetLastError() << logger.end;
-		return ;
-	}
+        if (!g_hDC)
+        {
+            logger.error(0) << "GetDC fail " << GetLastError() << logger.end;
+            return ;
+        }
 
-	memset(&pfd, 0, sizeof(pfd));
-	pfd.nSize      = sizeof(pfd);
-	pfd.nVersion   = 1;
-	pfd.dwFlags    = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 32;
-	pfd.cDepthBits = 24;
+        memset(&pfd, 0, sizeof(pfd));
+        pfd.nSize      = sizeof(pfd);
+        pfd.nVersion   = 1;
+        pfd.dwFlags    = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+        pfd.iPixelType = PFD_TYPE_RGBA;
+        pfd.cColorBits = 32;
+        pfd.cDepthBits = 24;
 
-	format = ChoosePixelFormat(g_hDC, &pfd);
-	if (!format || !SetPixelFormat(g_hDC, format, &pfd))
-	{
-		logger.error(0) << "Setting pixel format fail " << GetLastError() << logger.end;
-		return ;
-	}
+        format = ChoosePixelFormat(g_hDC, &pfd);
+        if (!format || !SetPixelFormat(g_hDC, format, &pfd))
+        {
+            logger.error(0) << "Setting pixel format fail " << GetLastError() << logger.end;
+            return ;
+        }
 
-	hRCTemp = wglCreateContext(g_hDC);
-	if (!hRCTemp || !wglMakeCurrent(g_hDC, hRCTemp))
-	{
-		logger.error(0) << "Сreating temp render context fail " << GetLastError() << logger.end;
-		return ;
-	}
+        hRCTemp = wglCreateContext(g_hDC);
+        if (!hRCTemp || !wglMakeCurrent(g_hDC, hRCTemp))
+        {
+            logger.error(0) << "Сreating temp render context fail " << GetLastError() << logger.end;
+            return ;
+        }
 
-	OPENGL_GET_PROC(PFNGLCREATESHADERPROC,      glCreateShader);
-	OPENGL_GET_PROC(PFNGLDELETESHADERPROC,      glDeleteShader);
-	OPENGL_GET_PROC(PFNGLSHADERSOURCEPROC,      glShaderSource);
-	OPENGL_GET_PROC(PFNGLCOMPILESHADERPROC,     glCompileShader);
-	OPENGL_GET_PROC(PFNGLGETSHADERIVPROC,       glGetShaderiv);
-	OPENGL_GET_PROC(PFNGLGETSHADERINFOLOGPROC,  glGetShaderInfoLog);
+        OPENGL_GET_PROC(PFNGLCREATESHADERPROC,      glCreateShader);
+        OPENGL_GET_PROC(PFNGLDELETESHADERPROC,      glDeleteShader);
+        OPENGL_GET_PROC(PFNGLSHADERSOURCEPROC,      glShaderSource);
+        OPENGL_GET_PROC(PFNGLCOMPILESHADERPROC,     glCompileShader);
+        OPENGL_GET_PROC(PFNGLGETSHADERIVPROC,       glGetShaderiv);
+        OPENGL_GET_PROC(PFNGLGETSHADERINFOLOGPROC,  glGetShaderInfoLog);
 
 
 
 #else
-    /* I'm not gonna render anything so minimal context creation using root window */
-    Display *dpy;
-    Window root;
-    GLint attr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
-    XVisualInfo *vi;
-    GLXContext glc;
+        /* I'm not gonna render anything so minimal context creation using root window */
+        Display *dpy;
+        Window root;
+        GLint attr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
+        XVisualInfo *vi;
+        GLXContext glc;
 
-    /* open display */
-    if ( ! (dpy = XOpenDisplay(NULL)) ) {
-        logger.error(0) << "cannot connect to X server" << logger.end;
-        return;
-    }
+        /* open display */
+        if ( ! (dpy = XOpenDisplay(NULL)) ) {
+            logger.error(0) << "cannot connect to X server" << logger.end;
+            return;
+        }
 
-    /* get root window */
-    root = DefaultRootWindow(dpy);
+        /* get root window */
+        root = DefaultRootWindow(dpy);
 
-    /* get visual matching attr */
-    if( ! (vi = glXChooseVisual(dpy, 0, attr)) ) {
-        logger.error(0) << "no appropriate visual found" << logger.end;
-        return;
-    }
+        /* get visual matching attr */
+        if( ! (vi = glXChooseVisual(dpy, 0, attr)) ) {
+            logger.error(0) << "no appropriate visual found" << logger.end;
+            return;
+        }
 
-    /* create a context using the root window */
-    if ( ! (glc = glXCreateContext(dpy, vi, NULL, GL_TRUE)) ){
-        logger.error(0) << "failed to create OpenGL context" << logger.end;
-        return;
-    }
-    glXMakeCurrent(dpy, root, glc);
+        /* create a context using the root window */
+        if ( ! (glc = glXCreateContext(dpy, vi, NULL, GL_TRUE)) ){
+            logger.error(0) << "failed to create OpenGL context" << logger.end;
+            return;
+        }
+        glXMakeCurrent(dpy, root, glc);
 
-    logger.verbose(0) << "OpenGL vendor:" << glGetString(GL_VENDOR) << logger.end;
+        logger.verbose(0) << "OpenGL vendor:" << glGetString(GL_VENDOR) << logger.end;
 #endif
-	openGLcontextInitialized = true;
-	}
+        openGLcontextInitialized = true;
+    }
 }
 
 
