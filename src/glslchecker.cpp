@@ -25,7 +25,7 @@ PFNGLGETSHADERINFOLOGPROC  glGetShaderInfoLog = 0;
 #endif
 
 
-static const char*  v_1 [] = {  
+static const char*  d_1 [] = {  
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 0\n",
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 1\n",
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 2\n",
@@ -34,76 +34,71 @@ static const char*  v_1 [] = {
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 2\n#define REFLECTIONS 1\n",
 	"#define LIGHTING 0\n#undef LIGHTING_QUALITY\n",
 };
-static const char*  v_2 [] = { 
+static const char*  d_2 [] = { 
 	"#define CLOUDS 1\n",
 	"#undef CLOUDS\n"
 };
-static const char*  v_3 [] = { 
+static const char*  d_3 [] = { 
 	"#define TERRAIN_DEREPEAT 1\n",
 	"#undef TERRAIN_DEREPEAT\n"
 };
-static const char*  v_4 [] = { 
+static const char*  d_4 [] = { 
 	"#define FALLOFF_QUALITY 1\n",
 	"#define FALLOFF_QUALITY 0\n"
 };
-static const char*  v_5 [] = { 
+static const char*  d_5 [] = { 
 	"#define FOG_TYPE 0\n",
 	"#define FOG_TYPE 1\n"
 };
-static const char*  v_6 [] = { 
+static const char*  d_6 [] = { 
 	"#define SHADOWS 0\n",
 	"#define SHADOWS 1\n"
 };
-static const char*  v_7 [] = { 
+static const char*  d_7 [] = { 
 	"#define NUM_BONES 1\n#define NUM_BONE_WEIGHTS 3\n",
 	"#define NUM_BONES 0\n"
 };
-static const char*  v_8 [] = { 
+static const char*  d_8 [] = { 
 	"#define FOG_OF_WAR 0\n",
 	"#define FOG_OF_WAR 1\n"
 };
-static const char*  v_9 [] = { 
+static const char*  d_9 [] = { 
 	"#define SHADOWMAP_TYPE 0\n",
 	"#define SHADOWMAP_TYPE 1\n"
 };
-static const char*  v_10[] = { 
+static const char*  d_10[] = { 
 	"#define FOG_QUALITY 0\n",
 	"#define FOG_QUALITY 1\n"
 };
-
-static const char*  p_1 [] = { 
+static const char*  d_11 [] = { 
 	"#define GROUND_AMBIENT 1\n",
 	"#undef GROUND_AMBIENT\n"
 };
-static const char*  p_2 [] = { 
+static const char*  d_12 [] = { 
 	"#define TERRAIN_ALPHAMAP 1\n",
 	"#undef TERRAIN_ALPHAMAP\n"
 };
-static const char*  p_3 [] = { 
+static const char*  d_13 [] = { 
 	"#define RXGB_NORMALMAP 1\n",
 	"#undef RXGB_NORMALMAP\n"
 };
-static const char*  p_4 [] = { 
+static const char*  d_14 [] = { 
 	"#define NUM_POINT_LIGHTS 1\n",
 	"#define NUM_POINT_LIGHTS 0\n"
 };
-static const char*  p_5 [] = { 
+static const char*  d_15 [] = { 
 	"#define SHADOWMAP_FILTER_WIDTH 1\n",
 	"#define SHADOWMAP_FILTER_WIDTH 0\n"
 };
-static const char*  p_6 [] = { 
+static const char*  d_17 [] = { 
 	"#define TEXKILL 1\n",
 	"#define TEXKILL 0\n"
 };
-static const char*  p_7 [] = { 
+static const char*  d_18 [] = { 
 	"#define WATER_QUALITY 0\n",
 	"#define WATER_QUALITY 1\n",
 	"#define WATER_QUALITY 2\n",
 	"#define WATER_QUALITY 3\n"
-};
-
-static const char*  v_xxx [] = {  
-	"#define WATER_QUALITY 2\n#define LIGHTING 1\n",
 };
 
 static CartesianProduct<const char*> cart_product;

@@ -3,6 +3,7 @@
 #include "checker.h"
 #include "manifest.h"
 #include <vector>
+#include <map>
 
 class ShaderChecker: public IChecker
 {
