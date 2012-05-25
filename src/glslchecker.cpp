@@ -1,7 +1,6 @@
 #include "glslchecker.h"
 #include "GL/glext.h"
 #include "logger.h"
-#include "cart_product.h"
 #ifndef _WIN32
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
@@ -25,6 +24,11 @@ PFNGLGETSHADERINFOLOGPROC  glGetShaderInfoLog = 0;
 #endif
 
 
+static const char*  k_1 [] = {  
+	"LIGHTING",
+	"LIGHTING_QUALITY",
+	"REFLECTIONS",
+};
 static const char*  d_1 [] = {  
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 0\n",
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 1\n",
@@ -32,82 +36,102 @@ static const char*  d_1 [] = {
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 0\n#define REFLECTIONS 1\n",
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 1\n#define REFLECTIONS 1\n",
 	"#define LIGHTING 1\n#define LIGHTING_QUALITY 2\n#define REFLECTIONS 1\n",
-	"#define LIGHTING 0\n#undef LIGHTING_QUALITY\n",
+	"#define LIGHTING 0\n",
 };
+static const char*  k_2 [] = { "CLOUDS" };
 static const char*  d_2 [] = { 
-	"#define CLOUDS 1\n",
-	"#undef CLOUDS\n"
+	"#define CLOUDS\n",
+	""
 };
+static const char*  k_3 [] = { "TERRAIN_DEREPEAT" };
 static const char*  d_3 [] = { 
 	"#define TERRAIN_DEREPEAT 1\n",
-	"#undef TERRAIN_DEREPEAT\n"
+	"#define TERRAIN_DEREPEAT 0\n"
 };
+static const char*  k_4 [] = { "FALLOFF_QUALITY" };
 static const char*  d_4 [] = { 
 	"#define FALLOFF_QUALITY 1\n",
 	"#define FALLOFF_QUALITY 0\n"
 };
+static const char*  k_5 [] = { "FOG_TYPE" };
 static const char*  d_5 [] = { 
 	"#define FOG_TYPE 0\n",
 	"#define FOG_TYPE 1\n"
 };
+static const char*  k_6 [] = { "SHADOWS" };
 static const char*  d_6 [] = { 
 	"#define SHADOWS 0\n",
 	"#define SHADOWS 1\n"
 };
+static const char*  k_7 [] = { "NUM_BONES" };
 static const char*  d_7 [] = { 
 	"#define NUM_BONES 1\n#define NUM_BONE_WEIGHTS 3\n",
 	"#define NUM_BONES 0\n"
 };
+static const char*  k_8 [] = { "FOG_OF_WAR" };
 static const char*  d_8 [] = { 
 	"#define FOG_OF_WAR 0\n",
 	"#define FOG_OF_WAR 1\n"
 };
+static const char*  k_9 [] = { "SHADOWMAP_TYPE" };
 static const char*  d_9 [] = { 
 	"#define SHADOWMAP_TYPE 0\n",
 	"#define SHADOWMAP_TYPE 1\n"
 };
+static const char*  k_10 [] = { "FOG_QUALITY" };
 static const char*  d_10[] = { 
 	"#define FOG_QUALITY 0\n",
 	"#define FOG_QUALITY 1\n"
 };
+static const char*  k_11 [] = { "GROUND_AMBIENT" };
 static const char*  d_11 [] = { 
 	"#define GROUND_AMBIENT 1\n",
 	"#undef GROUND_AMBIENT\n"
 };
+static const char*  k_12 [] = { "TERRAIN_ALPHAMAP" };
 static const char*  d_12 [] = { 
 	"#define TERRAIN_ALPHAMAP 1\n",
 	"#undef TERRAIN_ALPHAMAP\n"
 };
+static const char*  k_13 [] = { "RXGB_NORMALMAP" };
 static const char*  d_13 [] = { 
 	"#define RXGB_NORMALMAP 1\n",
 	"#undef RXGB_NORMALMAP\n"
 };
+static const char*  k_14 [] = { "NUM_POINT_LIGHTS" };
 static const char*  d_14 [] = { 
 	"#define NUM_POINT_LIGHTS 1\n",
 	"#define NUM_POINT_LIGHTS 0\n"
 };
+static const char*  k_15 [] = { "SHADOWMAP_FILTER_WIDTH" };
 static const char*  d_15 [] = { 
 	"#define SHADOWMAP_FILTER_WIDTH 1\n",
 	"#define SHADOWMAP_FILTER_WIDTH 0\n"
 };
-static const char*  d_17 [] = { 
+static const char*  k_16 [] = { "TEXKILL" };
+static const char*  d_16 [] = { 
 	"#define TEXKILL 1\n",
 	"#define TEXKILL 0\n"
 };
-static const char*  d_18 [] = { 
+static const char*  k_17 [] = { "WATER_QUALITY" };
+static const char*  d_17 [] = { 
 	"#define WATER_QUALITY 0\n",
 	"#define WATER_QUALITY 1\n",
 	"#define WATER_QUALITY 2\n",
 	"#define WATER_QUALITY 3\n"
 };
 
-static CartesianProduct<const char*> cart_product;
 static bool openGLcontextInitialized = false;
 
-template <typename T,size_t N>
-inline void push_vector_back(std::vector<std::vector<T> >& v,T (&va)[N])
+template <typename T,size_t K,size_t N>
+inline void add_define_pair(std::vector<std::pair<std::vector<T>,std::vector<T> > >& v,T (&k)[K],T (&d)[N])
 {
-    v.push_back(std::vector<T>(&va[0], &va[0] + N));
+    v.push_back(
+		std::pair<std::vector<T>,std::vector<T> >(
+			std::vector<T>(&k[0], &k[0] + K),
+			std::vector<T>(&d[0], &d[0] + N)
+			)
+		);
 }
 
 std::string const& GLSLChecker::cmdOption() const
@@ -281,57 +305,47 @@ std::string const& GLSLPSChecker::reString() const
     static std::string cmd = ".*/ps_glsl.*\\.psh";
     return cmd;
 }
+#define ADD_SHADER_MACRO_DEFINE(N) add_define_pair(_defines,k_##N,d_##N)
 
 GLSLVSChecker::GLSLVSChecker() : GLSLChecker()
 {
     type = GL_VERTEX_SHADER;
-    std::vector<std::vector<const char*> > tmp;
-    push_vector_back(tmp,v_1);
-    push_vector_back(tmp,v_2);
-    push_vector_back(tmp,v_3);
-    push_vector_back(tmp,v_4);
-    push_vector_back(tmp,v_5);
-    push_vector_back(tmp,v_6);
-    push_vector_back(tmp,v_7);
-    push_vector_back(tmp,v_8);
-    push_vector_back(tmp,v_9);
-    push_vector_back(tmp,v_10);
-    //push_vector_back(tmp,v_11);
-
-    cart_product(_defines,tmp);
-
+	ADD_SHADER_MACRO_DEFINE(1);
+	ADD_SHADER_MACRO_DEFINE(2);
+	ADD_SHADER_MACRO_DEFINE(3);
+	ADD_SHADER_MACRO_DEFINE(4);
+	ADD_SHADER_MACRO_DEFINE(5);
+	ADD_SHADER_MACRO_DEFINE(6);
+	ADD_SHADER_MACRO_DEFINE(7);
+	ADD_SHADER_MACRO_DEFINE(8);
+	ADD_SHADER_MACRO_DEFINE(9);
+	ADD_SHADER_MACRO_DEFINE(11);
+	ADD_SHADER_MACRO_DEFINE(12);
+	ADD_SHADER_MACRO_DEFINE(13);
+	ADD_SHADER_MACRO_DEFINE(14);
+	ADD_SHADER_MACRO_DEFINE(15);
+	ADD_SHADER_MACRO_DEFINE(16);
+	ADD_SHADER_MACRO_DEFINE(17);
 }
 GLSLPSChecker::GLSLPSChecker() : GLSLChecker()
 {
-    type = GL_FRAGMENT_SHADER;
-    std::vector<std::vector<const char*> > tmp;
-    /*push_vector_back(tmp,v_1);
-    push_vector_back(tmp,v_2);
-    push_vector_back(tmp,v_3);
-    push_vector_back(tmp,v_4);
-    push_vector_back(tmp,v_5);
-    push_vector_back(tmp,v_6);
-    push_vector_back(tmp,v_7);
-    push_vector_back(tmp,v_8);
-    push_vector_back(tmp,v_9);
-    push_vector_back(tmp,v_10);*/
-    //push_vector_back(tmp,v_11);
-
-
-    
-	/*push_vector_back(tmp,p_1);
-    push_vector_back(tmp,p_2);
-    push_vector_back(tmp,p_3);
-    push_vector_back(tmp,p_4);
-    push_vector_back(tmp,p_5);
-    push_vector_back(tmp,p_6);
-    push_vector_back(tmp,p_7);*/
-    //push_vector_back(tmp,p_8);
-
-	push_vector_back(tmp,v_xxx);
-	
-
-    cart_product(_defines,tmp);
+	type = GL_FRAGMENT_SHADER;
+	ADD_SHADER_MACRO_DEFINE(1);
+	ADD_SHADER_MACRO_DEFINE(2);
+	ADD_SHADER_MACRO_DEFINE(3);
+	ADD_SHADER_MACRO_DEFINE(4);
+	ADD_SHADER_MACRO_DEFINE(5);
+	ADD_SHADER_MACRO_DEFINE(6);
+	ADD_SHADER_MACRO_DEFINE(7);
+	ADD_SHADER_MACRO_DEFINE(8);
+	ADD_SHADER_MACRO_DEFINE(9);
+	ADD_SHADER_MACRO_DEFINE(11);
+	ADD_SHADER_MACRO_DEFINE(12);
+	ADD_SHADER_MACRO_DEFINE(13);
+	ADD_SHADER_MACRO_DEFINE(14);
+	ADD_SHADER_MACRO_DEFINE(15);
+	ADD_SHADER_MACRO_DEFINE(16);
+	ADD_SHADER_MACRO_DEFINE(17);
 }
 
 
