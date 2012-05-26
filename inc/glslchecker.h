@@ -23,11 +23,13 @@ class GLSLVSChecker : public GLSLChecker
     public:
     std::string const& reString() const;
     GLSLVSChecker();
+    IChecker* clone();
 };
 class GLSLPSChecker : public GLSLChecker
 {
     public:
     std::string const& reString() const;
     GLSLPSChecker();
+    IChecker* clone();
 };
 #endif

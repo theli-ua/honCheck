@@ -50,7 +50,7 @@ int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& 
 		}
 		else
 		{
-			for(int i = 0 ; i < combinedDefines.size(); ++i)
+			for(int i = 0 ; i < combinedDefines.size() && result == 0; ++i)
 			{
 				std::copy(combinedDefines[i].begin(),combinedDefines[i].end(),&strings[0]);
 				result += Compile(strings,size + 1);

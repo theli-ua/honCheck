@@ -37,7 +37,7 @@ $(OBJ)/%.o: src/%.c
 $(OBJ)/%.o.mp: src/%.cpp
 	$(CXX) $(CXXFLAGS) -fopenmp -c $< -o $@ 	
 #---------------------------------------------------------------------------------
-$(OBJ)/%.o.mp: src/%.c
+$(OBJ)/%.mp.o: src/%.c
 	$(CC) $(CFLAGS) -fopenmp -c $< -o $@
 
 $(BUILD)/$(TARGET): $(OFILES)

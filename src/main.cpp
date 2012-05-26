@@ -178,7 +178,7 @@ int main(int argc, char** argv)
                         read = true;
                     }
                     if ((*it)->Check(entry,data) != 0)
-#pragma omp critical(error)
+#pragma omp critical (error)
                     {
                         logger.error(0) << (*it)->name() << " returned error for" << logger.end;
                         logger.error(0) << "\t" << entry.path() << logger.end;
