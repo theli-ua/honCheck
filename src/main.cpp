@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 #pragma omp parallel \
     firstprivate(manifest,checkers,size) \
     private(resReader) \
-    shared(errCount,processed,logger)
+    shared(errCount,processed,logger) schedule(dynamic)
     {
 #ifdef _OPENMP
         if (omp_get_thread_num() != 0)
@@ -170,8 +170,10 @@ int main(int argc, char** argv)
             {
                 if((*it)->Match(entry))
                 {
+#ifndef _OPENMP
                     logger.trace(0) << "Gonna check entry with path: " << entry.path();
                     logger.trace(0) << logger.end;
+#else
                     if(!read)
                     {
                         data = resReader.Read(entry);
@@ -188,9 +190,8 @@ int main(int argc, char** argv)
             }
 #pragma omp atomic
             processed++;
-#ifdef _OPENMP
-            if (omp_get_thread_num() == 0)
-#endif
+            if (processed % 10 == 0)
+#pragma omp critical (log)
                 logger.verbose(0) << "Processed: " << processed << "/" << size << logger.rend;
         }
 #ifdef _OPENMP

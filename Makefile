@@ -7,7 +7,7 @@ TARGET 		:= 	honCheck
 OMPTARGET 	:= 	honCheck-openmp
 
 
-CFLAGS		:=	-I$(INCLUDES) $(shell xml2-config --cflags) -g -DGL_GLEXT_PROTOTYPES
+CFLAGS		:=	-I$(INCLUDES) $(shell xml2-config --cflags) -O3 -DGL_GLEXT_PROTOTYPES
 CFLAGS		+= $(shell pkg-config minizip --cflags)
 CXXFLAGS	:=	$(CFLAGS)
 

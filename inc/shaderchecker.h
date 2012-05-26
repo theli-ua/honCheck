@@ -11,6 +11,7 @@ class ShaderChecker: public IChecker
 	typedef std::pair<std::vector<const char*>,std::vector<const char*> > DefinesPair;
 	typedef std::vector<DefinesPair> DefinesV;
     int Check(Manifest::Entry const& entry, std::vector<char> const& data) const;
+    ShaderChecker();
 
     protected:
     /**
@@ -24,8 +25,8 @@ class ShaderChecker: public IChecker
     virtual int Compile(const char** strings,int stringCount) const = 0;
 
     /**
-     * @brief array of defines' product
+     * @brief String to include as first in each set of defines
      */
-	std::vector<std::pair<std::vector<const char*>,std::vector<const char*> > > _defines;
+    const char* prologue;
 };
 #endif
