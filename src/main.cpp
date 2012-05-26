@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 #pragma omp parallel \
     firstprivate(manifest,checkers,size) \
     private(resReader) \
-    shared(errCount,processed,logger) schedule(dynamic)
+    shared(errCount,processed,logger)
     {
 #ifdef _OPENMP
         if (omp_get_thread_num() != 0)
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
             }
         }
 #endif
-#pragma omp for
+#pragma omp for schedule(dynamic)
         for(int i = 0; i < size ; ++i)
         {
             Manifest::Entry const& entry = manifest[i];
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
 #ifndef _OPENMP
                     logger.trace(0) << "Gonna check entry with path: " << entry.path();
                     logger.trace(0) << logger.end;
-#else
+#endif
                     if(!read)
                     {
                         data = resReader.Read(entry);
