@@ -24,6 +24,7 @@ int Manifest::Parse(const char* path)
 {
     xmlDoc *doc = NULL;
     xmlNode *root_element = NULL;
+    xmlChar *str;
 	Logger& logger = Logger::get_instance();
 
     LIBXML_TEST_VERSION
@@ -41,31 +42,37 @@ int Manifest::Parse(const char* path)
         xmlFreeDoc(doc);
         return -1;
     }
-    version.assign(reinterpret_cast<const char*>(xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("version"))));
-    if ( version == "" )
+    str = xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("version"));
+    version.assign(reinterpret_cast<const char*>(str));
+    if ( str == NULL )
     {
         logger.error(0) << "manifest tag is missing version attribute" << logger.end;
     }
     else
     {
+        xmlFree(str);
         logger.verbose(0) << "manifest version: " << version << logger.end;
     }
-    os.assign(reinterpret_cast<const char*>(xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("os"))));
-    if ( version == "" )
+    str = xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("os"));
+    os.assign(reinterpret_cast<const char*>(str));
+    if ( str == NULL )
     {
         logger.error(0) << "manifest tag is missing os attribute" << logger.end;
     }
     else
     {
+        xmlFree(str);
         logger.verbose(0) << "manifest os: " << os << logger.end;
     }
-    arch.assign(reinterpret_cast<const char*>(xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("arch"))));
-    if ( version == "" )
+    str = xmlGetProp(root_element,reinterpret_cast<const xmlChar*>("arch"));
+    arch.assign(reinterpret_cast<const char*>(str));
+    if ( str == NULL )
     {
         logger.error(0) << "manifest tag is missing arch attribute" << logger.end;
     }
     else
     {
+        xmlFree(str);
         logger.verbose(0) << "manifest arch: " << arch << logger.end;
     }
     for (xmlNode *cur_node = root_element->children; cur_node; cur_node = cur_node->next) {
@@ -93,55 +100,58 @@ std::vector<Manifest::Entry>::size_type Manifest::size()
 Manifest::Entry::Entry(xmlNode* node)
 {
 	Logger& logger = Logger::get_instance();
+    xmlChar *str;
 
-    _path.assign(reinterpret_cast<const char*>(xmlGetProp(node,
-                    reinterpret_cast<const xmlChar*>("path"))));
-    if (_path == "")
+    str = xmlGetProp(node,reinterpret_cast<const xmlChar*>("path"));
+    _path.assign(reinterpret_cast<const char*>(str));
+    if (str == NULL)
     {
         logger.error(0) << "Node is missing path attribute" << logger.end;
     }
     else
     {
+        xmlFree(str);
         logger.trace(0) << "Node path: " << _path << logger.end;
     }
 
 
+    str = xmlGetProp(node,reinterpret_cast<const xmlChar*>("checksum"));
+    if (str != NULL)
     {
         std::stringstream ss;
-        ss << std::hex << reinterpret_cast<const char*>(xmlGetProp(node,
-                    reinterpret_cast<const xmlChar*>("checksum")));
+        ss << std::hex << reinterpret_cast<const char*>(str);
         ss >> _checksum;
-    }
-
-    if(_checksum == 0)
-    {
-        logger.error(0) << "Node has missing or zeroed checksum attribute (";
-        logger.error(0) << _path << ")" << logger.end;
+        xmlFree(str);
+        if(_checksum == 0)
+        {
+            logger.error(0) << "Node has missing or zeroed checksum attribute (";
+            logger.error(0) << _path << ")" << logger.end;
+        }
+        else
+        {
+            logger.trace(0) << "Node checksum: " << _checksum << logger.end;
+        }
     }
     else
     {
-        logger.trace(0) << "Node checksum: " << _checksum << logger.end;
+        logger.error(0) << "Node has missing checksum attribute (";
+        logger.error(0) << _path << ")" << logger.end;
     }
 
+
+    str = xmlGetProp(node,reinterpret_cast<const xmlChar*>("size"));
+    if (str != NULL)
     {
         std::stringstream ss;
-        ss << reinterpret_cast<const char*>(xmlGetProp(node,
-                    reinterpret_cast<const xmlChar*>("size")));
+        ss << reinterpret_cast<const char*>(str);
         ss >> _size;
+        xmlFree(str);
     }
-
-
-    //if(_size == 0)
-    //{
-        //logger.error(0) << "Node is missing size attribute (";
-        //logger.error(0) << _path << ")" << logger.end;
-    //}
-    //else
-    //{
-        //logger.trace(0) << "Node size: " << _size << logger.end;
-    //}
-
-
+    else
+    {
+        logger.error(0) << "Node is missing size attribute (";
+        logger.error(0) << _path << ")" << logger.end;
+    }
 }
 
 std::string const& Manifest::Entry::path() const

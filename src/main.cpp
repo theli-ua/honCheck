@@ -19,7 +19,12 @@
 #include "resreader.h"
 
 #include "crcchecker.h"
+#include "xmlchecker.h"
 #include "glslchecker.h"
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 namespace TC = TermAnsiColor;
 
@@ -45,12 +50,15 @@ int main(int argc, char** argv)
 
     if (contains(args,std::string("--verbose")))
         logger.set_verbose(verbose, 0);
+#ifndef _OPENMP
     if (contains(args,std::string("--trace")))
         logger.set_trace(trace);
+#endif
 
     /* Add checker classes here */
 
     checkers.push_back(new CRCChecker());
+    checkers.push_back(new XMLChecker());
     checkers.push_back(new GLSLVSChecker());
     checkers.push_back(new GLSLPSChecker());
 
@@ -61,14 +69,16 @@ int main(int argc, char** argv)
         logger.error(0) << "Options: " << logger.end;
         logger.error(0) << "\t--help\t\tthis message" << logger.end;
         logger.error(0) << "\t--verbose\tverbose output" << logger.end;
+#ifndef _OPENMP
         logger.error(0) << "\t--trace\t\ttrace output (slows down execution a lot)" << logger.end;
+#endif
         logger.error(0) << "\t--dir <dir>\tdirectory to read manifest/files from(default is current directory)" << logger.end;
         logger.error(0) << "Checkers' switches:" << logger.end;
         for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
                 ++it)
         {
             IChecker const& checker = **it;
-            logger.error(0) << "\t" << checker.cmdOption() << "\tdisable ";
+            logger.error(0) << "\t" << checker.cmdOption() << "\tenable ";
             logger.error(0) << checker.name() << logger.end;
         }
         return 0;
@@ -87,7 +97,7 @@ int main(int argc, char** argv)
 
     for(int i = 0 ; i < checkers.size() ; ++i)
     {
-        if(contains(args,checkers[i]->cmdOption()))
+        if(!contains(args,checkers[i]->cmdOption()))
         {
             delete(checkers[i]);
             checkers.erase(checkers.begin() + i--);
@@ -129,38 +139,71 @@ int main(int argc, char** argv)
     int size = manifest.size();
 
     int processed = 0;
-    
-#pragma omp parallel for private(resReader) firstprivate(manifest,checkers,size) schedule(dynamic)\
-    shared(errCount,processed,logger)
-    for(int i = 0; i < size ; ++i)
-    {
-        Manifest::Entry const& entry = manifest[i];
 
-        std::vector<char> data;
-        bool read = false;
-        
-        for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
-                ++it)
+#pragma omp parallel \
+    firstprivate(manifest,checkers,size) \
+    private(resReader) \
+    shared(errCount,processed,logger)
+    {
+#ifdef _OPENMP
+        if (omp_get_thread_num() != 0)
         {
-            if((*it)->Match(entry))
+            /* Create local checkers' copies */
+            for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                    ++it)
             {
-                if(!read)
-                {
-                    data = resReader.Read(entry);
-                    read = true;
-                }
-                if ((*it)->Check(entry,data) != 0)
-                {
-                    logger.error(0) << (*it)->name() << " returned error for" << logger.end;
-                    logger.error(0) << "\t" << entry.path() << logger.end;
-#pragma omp atomic
-                    errCount++;
-                }
+                *it = (*it)->clone();
+                (*it)->Initialise();
             }
         }
+#endif
+#pragma omp for
+        for(int i = 0; i < size ; ++i)
+        {
+            Manifest::Entry const& entry = manifest[i];
+
+            std::vector<char> data;
+            bool read = false;
+
+            for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                    ++it)
+            {
+                if((*it)->Match(entry))
+                {
+                    logger.trace(0) << "Gonna check entry with path: " << entry.path();
+                    logger.trace(0) << logger.end;
+                    if(!read)
+                    {
+                        data = resReader.Read(entry);
+                        read = true;
+                    }
+                    if ((*it)->Check(entry,data) != 0)
+#pragma omp critical(error)
+                    {
+                        logger.error(0) << (*it)->name() << " returned error for" << logger.end;
+                        logger.error(0) << "\t" << entry.path() << logger.end;
+                        errCount++;
+                    }
+                }
+            }
 #pragma omp atomic
-        processed++;
-        logger.verbose(0) << "Processed: " << processed << "/" << size << logger.rend;
+            processed++;
+#ifdef _OPENMP
+            if (omp_get_thread_num() == 0)
+#endif
+                logger.verbose(0) << "Processed: " << processed << "/" << size << logger.rend;
+        }
+#ifdef _OPENMP
+        if (omp_get_thread_num() != 0)
+        {
+            /* Destroy local checkers' copies */
+            for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                    ++it)
+            {
+                delete(*it);
+            }
+        }
+#endif
     }
     logger.verbose(0) << logger.end;
 

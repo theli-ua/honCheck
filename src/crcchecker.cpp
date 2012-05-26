@@ -3,7 +3,7 @@
 
 std::string const& CRCChecker::cmdOption() const
 {
-    static std::string cmd = "--no-crc";
+    static std::string cmd = "--crc";
     return cmd;
 }
 std::string const& CRCChecker::name() const
@@ -29,4 +29,8 @@ int CRCChecker::Check(Manifest::Entry const& entry, std::vector<char> const& dat
     }
 
     return 0;
+}
+IChecker* CRCChecker::clone()
+{
+    return new CRCChecker();
 }

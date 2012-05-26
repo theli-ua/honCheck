@@ -56,6 +56,15 @@ class IChecker
      */
     virtual int Check(Manifest::Entry const& entry, std::vector<char> const& data) const = 0;
 
+    /**
+     * @brief Clone/Prototype pattern, will be used for parallelisation so that
+     * each thread has his own copy of IChecker (eg to recreate OGL context for
+     * each thread)
+     *
+     * @return newly created class' object
+     */
+    virtual IChecker* clone() = 0;
+
     private:
     xmlRegexpPtr comp;
 };

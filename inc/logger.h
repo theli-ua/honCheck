@@ -85,6 +85,7 @@ inline Logger::Stream& Logger::Stream::operator<<(Logger::Stream& (*pf)(Logger::
 template<class T>
 Logger::Stream& Logger::Stream::add(const T& t)
 {
+#pragma omp critical (logger_add)
     _sstream << t;
     return *this;
 }
@@ -141,10 +142,13 @@ inline void Logger::set_trace(std::ostream& stream, int min_level)
 
 inline Logger::Stream& Logger::end(Logger::Stream& s)
 {
+#pragma omp critical(loggerend)
+    {
     s << TC::DEFAULT;
     if (s._current_output)
         *s._current_output << s.str() << std::endl;
     s.clear();
+    }
     return s;
 }
 inline Logger::Stream& Logger::rend(Logger::Stream& s)
