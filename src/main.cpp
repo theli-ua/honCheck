@@ -62,7 +62,9 @@ int main(int argc, char** argv)
     checkers.push_back(new XMLChecker());
     checkers.push_back(new GLSLChecker(GL_FRAGMENT_SHADER,".*/ps_glsl.*\\.psh"));
     checkers.push_back(new GLSLChecker(GL_VERTEX_SHADER,".*/vs_glsl.*\\.vsh"));
+#ifdef _WIN32
     checkers.push_back(new HLSLChecker("ps_2_0",".*/ps_2_0.*\\.psh"));
+#endif
 
     /* Stop adding checker classes */
 

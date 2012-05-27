@@ -15,7 +15,7 @@ DOXYGEN		:=	doxygen
 ECHO		:=	echo
 
 LDFLAGS		:= 
-LIBS		:=	-ltcmalloc $(shell xml2-config --libs) $(shell pkg-config --libs minizip)
+LIBS		:=	$(shell xml2-config --libs) $(shell pkg-config --libs minizip)
 LIBS		+=	-lGL
 
 CFILES		:=	$(wildcard $(SOURCES)/*.c)
