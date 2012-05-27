@@ -140,8 +140,26 @@ int main(int argc, char** argv)
 
     int processed = 0;
 
+#ifdef _OPENMP
+    std::vector<int> taskqueue;
+    for(int i = 0; i < size ; ++i)
+    {
+        Manifest::Entry const& entry = manifest[i];
+        for (std::vector<IChecker*>::iterator it = checkers.begin() ; it != checkers.end();
+                ++it)
+        {
+            if((*it)->Match(entry))
+            {
+                taskqueue.push_back(i);
+                break;
+            }
+        }
+    }
+    size = taskqueue.size();
+#endif
+
 #pragma omp parallel \
-    firstprivate(manifest,checkers,size) \
+    firstprivate(manifest,checkers,size,taskqueue) \
     private(resReader) \
     shared(errCount,processed,logger)
     {
@@ -160,8 +178,11 @@ int main(int argc, char** argv)
 #pragma omp for schedule(dynamic)
         for(int i = 0; i < size ; ++i)
         {
+#ifdef _OPENMP
+            Manifest::Entry const& entry = manifest[taskqueue[i]];
+#else
             Manifest::Entry const& entry = manifest[i];
-
+#endif
             std::vector<char> data;
             bool read = false;
 
@@ -190,9 +211,8 @@ int main(int argc, char** argv)
             }
 #pragma omp atomic
             processed++;
-            if (processed % 10 == 0)
 #pragma omp critical (log)
-                logger.verbose(0) << "Processed: " << processed << "/" << size << logger.rend;
+            logger.verbose(0) << "Processed: " << processed << "/" << size << logger.rend;
         }
 #ifdef _OPENMP
         if (omp_get_thread_num() != 0)

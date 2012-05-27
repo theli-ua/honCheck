@@ -146,7 +146,6 @@ inline void add_define_pair(std::vector<std::pair<std::vector<T>,std::vector<T> 
 static std::vector<std::pair<std::vector<const char*>,std::vector<const char*> > > _gen_defines()
 {
 std::vector<std::pair<std::vector<const char*>,std::vector<const char*> > > _defines;
-#if 1
     ADD_SHADER_MACRO_DEFINE(1);
     ADD_SHADER_MACRO_DEFINE(2);
     ADD_SHADER_MACRO_DEFINE(3);
@@ -164,7 +163,6 @@ std::vector<std::pair<std::vector<const char*>,std::vector<const char*> > > _def
     ADD_SHADER_MACRO_DEFINE(15);
     ADD_SHADER_MACRO_DEFINE(16);
     ADD_SHADER_MACRO_DEFINE(17);
-#endif
     return _defines;
 }
 
@@ -173,6 +171,7 @@ ShaderChecker::ShaderChecker() : IChecker()
 }
 int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& bdata) const
 {
+    /* those are the same for all shaders, gonna initialize once and reuse */
     static std::vector<std::pair<std::vector<const char*>,std::vector<const char*> > > _defines = _gen_defines();
 	int result = 0;
 
