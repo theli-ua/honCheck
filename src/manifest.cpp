@@ -12,6 +12,7 @@ Manifest::Manifest()
 }
 Manifest::~Manifest()
 {
+#pragma omp critical (xmlCleanupParser)
     xmlCleanupParser();
 }
 

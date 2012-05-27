@@ -21,7 +21,7 @@ template <typename T>
  */
 void cart_product(
         std::vector<std::vector<T> >& out,  // final result
-        std::vector<std::vector<T> >& in)  // input
+        std::vector<std::vector<T> >const& in)  // input
 
 {
     if (in.size() == 0)

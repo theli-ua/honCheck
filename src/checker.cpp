@@ -9,7 +9,6 @@ IChecker::~IChecker()
 {
     if (comp != NULL)  
         xmlRegFreeRegexp(comp);  
-    xmlCleanupParser();
 }
 
 int IChecker::Initialise()

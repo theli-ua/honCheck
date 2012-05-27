@@ -2,6 +2,9 @@
 #define _HLSLCHECKER_H
 #include "shaderchecker.h"
 
+/**
+ * @brief Implements IChecker to check HLSL shaders
+ */
 class HLSLChecker : public ShaderChecker
 {
     public:
