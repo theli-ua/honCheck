@@ -29,12 +29,12 @@ std::string const& GLSLChecker::name() const
     static std::string cmd = "GLSL Checker";
     return cmd;
 }
-
-GLSLChecker::GLSLChecker(): ShaderChecker()
+GLSLChecker::GLSLChecker(GLuint type,const char* regex): ShaderChecker(),
+    type(type),_regex(regex)
 {
     prologue = "#version 120\n";
     Logger& logger = Logger::get_instance();
-    /* we need context for each thread, but only one */
+    /* we need context for each thread, but only one per thread */
 #ifdef _WIN32
     if (wglGetCurrentContext() == NULL)
     {
@@ -189,29 +189,10 @@ GLSLChecker::GLSLChecker(): ShaderChecker()
 #endif
     }
 }
-
-
-std::string const& GLSLVSChecker::reString() const
+std::string const& GLSLChecker::reString() const
 {
-    static std::string cmd = ".*/vs_glsl/.*\\.vsh";
-    return cmd;
+    return _regex;
 }
-std::string const& GLSLPSChecker::reString() const
-{
-    static std::string cmd = ".*/ps_glsl.*\\.psh";
-    return cmd;
-}
-
-GLSLVSChecker::GLSLVSChecker() : GLSLChecker()
-{
-    type = GL_VERTEX_SHADER;
-}
-GLSLPSChecker::GLSLPSChecker() : GLSLChecker()
-{
-	type = GL_FRAGMENT_SHADER;
-}
-
-
 int GLSLChecker::Compile(const char** strings,int stringCount) const
 {
     int res = 0;
@@ -245,12 +226,7 @@ int GLSLChecker::Compile(const char** strings,int stringCount) const
     }
     return res;
 }
-
-IChecker* GLSLPSChecker::clone()
+IChecker* GLSLChecker::clone()
 {
-    return new GLSLPSChecker();
-}
-IChecker* GLSLVSChecker::clone()
-{
-    return new GLSLVSChecker();
+    return new GLSLChecker(type,_regex.c_str());
 }

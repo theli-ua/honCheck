@@ -16,26 +16,15 @@
 class GLSLChecker : public ShaderChecker
 {
     public:
-    GLSLChecker();
+    GLSLChecker(GLuint type,const char* regex);
     std::string const& cmdOption() const;
     std::string const& name() const;
+    std::string const& reString() const;
+    IChecker* clone();
     protected:
-    GLuint type;
     int Compile(const char** strings,int stringCount) const;
-};
-
-class GLSLVSChecker : public GLSLChecker
-{
-    public:
-    std::string const& reString() const;
-    GLSLVSChecker();
-    IChecker* clone();
-};
-class GLSLPSChecker : public GLSLChecker
-{
-    public:
-    std::string const& reString() const;
-    GLSLPSChecker();
-    IChecker* clone();
+    private:
+    std::string _regex;
+    GLuint type;
 };
 #endif

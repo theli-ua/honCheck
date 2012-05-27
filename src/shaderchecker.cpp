@@ -96,17 +96,17 @@ static const char*  d_9 [] = {
 static const char*  k_11 [] = { "GROUND_AMBIENT" };
 static const char*  d_11 [] = { 
 	"#define GROUND_AMBIENT 1\n",
-	"#undef GROUND_AMBIENT\n"
+	""
 };
 static const char*  k_12 [] = { "TERRAIN_ALPHAMAP" };
 static const char*  d_12 [] = { 
 	"#define TERRAIN_ALPHAMAP 1\n",
-	"#undef TERRAIN_ALPHAMAP\n"
+	""
 };
 static const char*  k_13 [] = { "RXGB_NORMALMAP" };
 static const char*  d_13 [] = { 
 	"#define RXGB_NORMALMAP 1\n",
-	"#undef RXGB_NORMALMAP\n"
+	""
 };
 static const char*  k_14 [] = { "NUM_POINT_LIGHTS" };
 static const char*  d_14 [] = { 

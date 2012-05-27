@@ -59,8 +59,8 @@ int main(int argc, char** argv)
 
     checkers.push_back(new CRCChecker());
     checkers.push_back(new XMLChecker());
-    checkers.push_back(new GLSLVSChecker());
-    checkers.push_back(new GLSLPSChecker());
+    checkers.push_back(new GLSLChecker(GL_FRAGMENT_SHADER,".*/ps_glsl.*\\.psh"));
+    checkers.push_back(new GLSLChecker(GL_VERTEX_SHADER,".*/vs_glsl.*\\.vsh"));
 
     /* Stop adding checker classes */
 
