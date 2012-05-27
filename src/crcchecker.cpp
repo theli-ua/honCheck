@@ -30,7 +30,7 @@ int CRCChecker::Check(Manifest::Entry const& entry, std::vector<char> const& dat
 
     return 0;
 }
-IChecker* CRCChecker::clone()
+IChecker* CRCChecker::clone() const
 {
     return new CRCChecker();
 }

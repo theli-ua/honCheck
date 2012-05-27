@@ -13,18 +13,27 @@
 #include "GL/wglext.h"
 #endif
 
+/**
+ * @brief Implements checker to check GLSL shaders
+ */
 class GLSLChecker : public ShaderChecker
 {
     public:
-    GLSLChecker(GLuint type,const char* regex);
-    std::string const& cmdOption() const;
-    std::string const& name() const;
-    std::string const& reString() const;
-    IChecker* clone();
+        /**
+         * @brief GLSLChecker constructor
+         *
+         * @param type GLuint type to use when compiling
+         * @param regex regular expression to match files' path
+         */
+        GLSLChecker(GLuint type,const char* regex);
+        std::string const& cmdOption() const;
+        std::string const& name() const;
+        std::string const& reString() const;
+        IChecker* clone() const;
     protected:
-    int Compile(const char** strings,int stringCount) const;
+        int Compile(const char** strings,int stringCount,const char* path) const;
     private:
-    std::string _regex;
-    GLuint type;
+        std::string _regex;
+        GLuint type;
 };
 #endif

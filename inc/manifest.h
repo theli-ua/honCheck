@@ -11,6 +11,9 @@
 class Manifest
 {
     public:
+        /**
+         * @brief Entry in the manifest
+         */
     class Entry
     {
         public:

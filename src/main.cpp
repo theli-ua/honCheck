@@ -21,6 +21,7 @@
 #include "crcchecker.h"
 #include "xmlchecker.h"
 #include "glslchecker.h"
+#include "hlslchecker.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -61,6 +62,7 @@ int main(int argc, char** argv)
     checkers.push_back(new XMLChecker());
     checkers.push_back(new GLSLChecker(GL_FRAGMENT_SHADER,".*/ps_glsl.*\\.psh"));
     checkers.push_back(new GLSLChecker(GL_VERTEX_SHADER,".*/vs_glsl.*\\.vsh"));
+    checkers.push_back(new HLSLChecker("ps_2_0",".*/ps_2_0.*\\.psh"));
 
     /* Stop adding checker classes */
 

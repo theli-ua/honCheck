@@ -3,16 +3,29 @@
 #include <vector>
 
 template <typename T>
+/**
+ * @brief Build a cartesian product of vectors  of vectors
+ * Functor
+ */
 class CartesianProduct{
 
     public:
         typedef std::vector<T> Vi;
+        /**
+         * @brief Struct to hold iterators while building product
+         */
         typedef struct {
             typename Vi::const_iterator begin;
             typename Vi::const_iterator end;
             typename Vi::const_iterator me;
         } Digits;
 
+        /**
+         * @brief Build a product
+         *
+         * @param out output vector
+         * @param in input vector
+         */
         void operator()(
                 std::vector<std::vector<T> >& out,  // final result
                 std::vector<std::vector<T> >& in)  // input

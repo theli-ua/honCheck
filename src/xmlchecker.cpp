@@ -28,7 +28,7 @@ int XMLChecker::Check(Manifest::Entry const& entry, std::vector<char> const& dat
 
     return 1;
 }
-IChecker* XMLChecker::clone()
+IChecker* XMLChecker::clone() const
 {
     return new XMLChecker();
 }

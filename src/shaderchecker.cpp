@@ -166,9 +166,6 @@ std::vector<std::pair<std::vector<const char*>,std::vector<const char*> > > _def
     return _defines;
 }
 
-ShaderChecker::ShaderChecker() : IChecker()
-{
-}
 int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& bdata) const
 {
     /* those are the same for all shaders, gonna initialize once and reuse */
@@ -217,14 +214,14 @@ int ShaderChecker::Check(Manifest::Entry const& entry, std::vector<char> const& 
 		strings[size] = data.c_str();
 		if (size == 0)
 		{
-			result += Compile(strings,1);
+			result += Compile(strings,1,entry.path().c_str());
 		}
 		else
 		{
 			for(int i = 0 ; i < combinedDefines.size() && result == 0; ++i)
 			{
 				std::copy(combinedDefines[i].begin(),combinedDefines[i].end(),&strings[0]);
-				result += Compile(strings,size + 1);
+				result += Compile(strings,size + 1,entry.path().c_str());
 			}
 		}
 		delete[] strings;

@@ -29,7 +29,7 @@ std::string const& GLSLChecker::name() const
     static std::string cmd = "GLSL Checker";
     return cmd;
 }
-GLSLChecker::GLSLChecker(GLuint type,const char* regex): ShaderChecker(),
+GLSLChecker::GLSLChecker(GLuint type,const char* regex):
     type(type),_regex(regex)
 {
     prologue = "#version 120\n";
@@ -193,7 +193,7 @@ std::string const& GLSLChecker::reString() const
 {
     return _regex;
 }
-int GLSLChecker::Compile(const char** strings,int stringCount) const
+int GLSLChecker::Compile(const char** strings,int stringCount, const char* path) const
 {
     int res = 0;
     {
@@ -226,7 +226,7 @@ int GLSLChecker::Compile(const char** strings,int stringCount) const
     }
     return res;
 }
-IChecker* GLSLChecker::clone()
+IChecker* GLSLChecker::clone() const
 {
     return new GLSLChecker(type,_regex.c_str());
 }

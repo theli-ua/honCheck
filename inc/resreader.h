@@ -4,6 +4,9 @@
 #include "unzip.h"
 #include <map>
 
+/**
+ * @brief Class to read raw/zipped files
+ */
 class ResourceReader
 {
     public:
