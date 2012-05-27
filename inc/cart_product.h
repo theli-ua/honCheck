@@ -31,6 +31,8 @@ class CartesianProduct{
                 std::vector<std::vector<T> >& in)  // input
 
         {
+            if (in.size() == 0)
+                return;
             typename std::vector<Digits> vd;
 
             // Start all of the iterators at the beginning.
