@@ -17,9 +17,17 @@ class ResourceReader
      *
      * @param entry Manifest::Entry
      *
-     * @return entry's data in a std::string buffer
+     * @return entry's data in a std::vector<char> buffer
      */
-    std::vector<char> Read(Manifest::Entry entry);
+    std::vector<char> Read(Manifest::Entry const& entry);
+	 /**
+     * @brief Read entry's data and return it
+     *
+     * @param path Path to file
+     *
+     * @return entry's data in a std::vector<char> buffer
+     */
+	std::vector<char> Read(const char* path);
     private:
     std::map<std::string,unzFile> zipFiles;
 };

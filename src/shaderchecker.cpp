@@ -24,7 +24,7 @@ static const char*  d_1 [] = {
 };
 static const char*  k_2 [] = { "CLOUDS" };
 static const char*  d_2 [] = { 
-	"#define CLOUDS\n",
+	"#define CLOUDS 1\n",
 	""
 };
 static const char*  k_3 [] = { "TERRAIN_DEREPEAT" };
@@ -37,6 +37,7 @@ static const char* k_4 [] = {
     "FOG_TYPE",
     "FOG_OF_WAR",
     "FOG_QUALITY",
+	"fog.h",
 };
 static const char* d_4 [] = {
     //"#define FOG_TYPE 0\n#define FOG_OF_WAR 0\n#define FOG_QUALITY 1\n#define FALLOFF_QUALITY 1\n",

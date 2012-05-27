@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="honCheck"
 	ProjectGUID="{634C05F4-8D48-4E2D-9316-312C717FA216}"
+	RootNamespace="honCheck"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib"
+				AdditionalDependencies="opengl32.lib Gdi32.lib User32.lib D3dx9.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -83,6 +83,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -130,7 +133,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib"
+				AdditionalDependencies="opengl32.lib Gdi32.lib User32.lib D3dx9.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -155,6 +158,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -203,7 +209,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib"
+				AdditionalDependencies="opengl32.lib Gdi32.lib User32.lib D3dx9.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-OpenMP.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -229,6 +235,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -264,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\inc\hlslchecker.h"
+				>
+			</File>
+			<File
 				RelativePath="..\inc\logger.h"
 				>
 			</File>
@@ -277,6 +290,14 @@
 			</File>
 			<File
 				RelativePath="..\inc\shaderchecker.h"
+				>
+			</File>
+			<File
+				RelativePath="..\inc\utils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\inc\xmlchecker.h"
 				>
 			</File>
 		</Filter>
@@ -298,6 +319,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\hlslchecker.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\logger.cpp"
 				>
 			</File>
@@ -315,6 +340,14 @@
 			</File>
 			<File
 				RelativePath="..\src\shaderchecker.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\xmlchecker.cpp"
 				>
 			</File>
 		</Filter>

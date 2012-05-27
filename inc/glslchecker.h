@@ -1,7 +1,6 @@
 #ifndef _GLSL_CHECKER_H
 #define _GLSL_CHECKER_H
 #include "shaderchecker.h"
-#include <GL/gl.h>
 #ifndef _WIN32
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
@@ -10,6 +9,10 @@
 #else
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
+#endif
+#include <GL/gl.h>
+#include "GL/glext.h"
+#ifdef _WIN32
 #include "GL/wglext.h"
 #endif
 

@@ -1,5 +1,4 @@
 #include "glslchecker.h"
-#include "GL/glext.h"
 #include "logger.h"
 
 

@@ -41,12 +41,12 @@ int main(int argc, char** argv)
             argv + argc /* this is an invalid address but works as a valid end for this case */);
 
     std::ostream verbose(std::cout.rdbuf());
-	std::ostream error(std::cerr.rdbuf());
-	std::ostream trace(std::cout.rdbuf());
+    std::ostream error(std::cerr.rdbuf());
+    std::ostream trace(std::cout.rdbuf());
 
     std::vector<IChecker*> checkers;
 
-	Logger& logger = Logger::get_instance();
+    Logger& logger = Logger::get_instance();
     logger.set_error(error, 0);
 
     if (contains(args,std::string("--verbose")))
@@ -63,7 +63,10 @@ int main(int argc, char** argv)
     checkers.push_back(new GLSLChecker(GL_FRAGMENT_SHADER,".*/ps_glsl.*\\.psh"));
     checkers.push_back(new GLSLChecker(GL_VERTEX_SHADER,".*/vs_glsl.*\\.vsh"));
 #ifdef _WIN32
-    checkers.push_back(new HLSLChecker("ps_2_0",".*/ps_2_0.*\\.psh"));
+    checkers.push_back(new HLSLChecker("ps_2_0",".*/ps_2_0.*\\.psh","PS"));
+    checkers.push_back(new HLSLChecker("vs_2_0",".*/vs_2_0.*\\.vsh","VS"));
+    checkers.push_back(new HLSLChecker("ps_3_0",".*/ps_3_0.*\\.psh","PS"));
+    checkers.push_back(new HLSLChecker("vs_3_0",".*/vs_3_0.*\\.vsh","VS"));
 #endif
 
     /* Stop adding checker classes */
