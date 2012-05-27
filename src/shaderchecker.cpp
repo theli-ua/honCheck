@@ -3,8 +3,6 @@
 #include "cart_product.h"
 #include <algorithm>
 
-static CartesianProduct<const char*> cart_product;
-
 /*  k_ ones are a strings to search in shader to include current set of defines
  *  for combinations product
  *  after all matching sets are found cartesian product is build on them

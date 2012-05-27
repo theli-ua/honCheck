@@ -14,7 +14,7 @@
 #endif
 
 /**
- * @brief Implements checker to check GLSL shaders
+ * @brief Implements IChecker to check GLSL shaders
  */
 class GLSLChecker : public ShaderChecker
 {
