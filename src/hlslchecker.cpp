@@ -112,19 +112,30 @@ IChecker* HLSLChecker::clone() const
 }
 HRESULT HLSLChecker::Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
 {
-    /* Compiler refuses to pass anything in pParentData argument
+	/* Compiler refuses to pass anything in pParentData argument
      * thus i'm just "having a number of standard locations"
      * as MSDN recommends to do
      */
-    if(includeCache.find(pFileName) == includeCache.end())
+	std::string realPath = "game/core/shaders/";
+	if(pFileName[0] == '.')
+	{
+		realPath += "whatever/";
+		realPath += pFileName;
+	}
+	else
+	{
+		realPath += target;
+		realPath += "/";
+		realPath += pFileName;
+	}
+
+    if(includeCache.find(realPath) == includeCache.end())
     {
-        std::string realPath = "game/core/shaders/whatever/";
-        realPath += pFileName;
-        includeCache[pFileName] = resReader.Read(realPath.c_str());
+        includeCache[realPath] = resReader.Read(realPath.c_str());
     }
-	*pBytes = includeCache[pFileName].size();
+	*pBytes = includeCache[realPath].size();
 	if(*pBytes != 0)
-		*ppData = &includeCache[pFileName][0];
+		*ppData = &includeCache[realPath][0];
 	else
 		*ppData = NULL;
     return S_OK;

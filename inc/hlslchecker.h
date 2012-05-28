@@ -33,7 +33,7 @@ class HLSLChecker : public ShaderChecker,public ID3DXInclude
         const char* pEntryPoint;
         std::string _regex;
         ResourceReader resReader;
-        std::map<LPCSTR,std::vector<char> > includeCache;
+		std::map<std::string,std::vector<char> > includeCache;
 };
 #endif
 #endif
