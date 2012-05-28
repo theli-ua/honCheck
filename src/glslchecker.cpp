@@ -28,8 +28,12 @@ std::string const& GLSLChecker::name() const
     static std::string cmd = "GLSL Checker";
     return cmd;
 }
+#ifdef _WIN32
+static const char GLWINDOW_CLASS_NAME[] = "GLWindow_class";
+#endif
 GLSLChecker::GLSLChecker(GLuint type,const char* regex):
-    type(type),_regex(regex)
+    type(type),_regex(regex),
+	g_hDC(NULL),g_hInstance(NULL),g_hRC(NULL),g_hWnd(NULL)
 {
     prologue = "#version 120\n";
     Logger& logger = Logger::get_instance();
@@ -38,13 +42,6 @@ GLSLChecker::GLSLChecker(GLuint type,const char* regex):
     if (wglGetCurrentContext() == NULL)
     {
         const unsigned char INPUT_UP = 0, INPUT_DOWN = 1, INPUT_PRESSED = 2;
-
-        static const char GLWINDOW_CLASS_NAME[] = "GLWindow_class";
-
-        static HINSTANCE g_hInstance = NULL;
-        static HWND      g_hWnd      = NULL;
-        static HDC       g_hDC       = NULL;
-        static HGLRC     g_hRC       = NULL;
 
         int width = 800;
         int height = 600;
@@ -77,7 +74,7 @@ GLSLChecker::GLSLChecker(GLuint type,const char* regex):
         wcx.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
         wcx.hCursor       = LoadCursor(NULL, IDC_ARROW);
 
-        if (!RegisterClassEx(&wcx))
+		if (!RegisterClassEx(&wcx) && GetLastError()!=ERROR_CLASS_ALREADY_EXISTS)
         {
 #pragma omp critical (log)
             logger.error(0) << "RegisterClassEx fail " << GetLastError() << logger.end;
@@ -183,10 +180,36 @@ GLSLChecker::GLSLChecker(GLuint type,const char* regex):
             return;
         }
         glXMakeCurrent(dpy, root, glc);
+#endif
 #pragma omp critical (log)
         logger.verbose(0) << "OpenGL vendor:" << glGetString(GL_VENDOR) << logger.end;
-#endif
     }
+}
+GLSLChecker::~GLSLChecker()
+{
+#ifdef _WIN32
+	if (g_hRC)
+	{
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(g_hRC);
+		g_hRC = NULL;
+	}
+	if (g_hDC)
+	{
+		ReleaseDC(g_hWnd, g_hDC);
+		g_hDC = NULL;
+	}
+	if (g_hWnd)
+	{
+		DestroyWindow(g_hWnd);
+		g_hWnd = NULL;
+	}
+	if (g_hInstance)
+	{
+		UnregisterClass(GLWINDOW_CLASS_NAME, g_hInstance);
+		g_hInstance = NULL;
+	}
+#endif
 }
 std::string const& GLSLChecker::reString() const
 {
@@ -194,6 +217,12 @@ std::string const& GLSLChecker::reString() const
 }
 int GLSLChecker::Compile(const char** strings,int stringCount, const char* path) const
 {
+#ifdef _WIN32
+    if (wglGetCurrentContext() == NULL)
+#else
+	if (glXGetCurrentContext() == NULL)
+#endif
+		return 1;
     int res = 0;
     {
         GLuint shader = glCreateShader(type);

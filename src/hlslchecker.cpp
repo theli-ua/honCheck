@@ -94,6 +94,11 @@ int HLSLChecker::Compile(const char** strings,int stringCount, const char* path)
         if(it->Name)
             delete[] it->Name;
     }
+
+	if(ppErrorMsgs)
+		ppErrorMsgs->Release();
+	if(ppShader)
+		ppShader->Release();
     return result;
 }
 IChecker* HLSLChecker::clone() const
