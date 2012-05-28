@@ -77,14 +77,19 @@ int HLSLChecker::Compile(const char** strings,int stringCount, const char* path)
         &defines[0],(LPD3DXINCLUDE)this,pEntryPoint,target,NULL,&ppShader,&ppErrorMsgs,NULL);
 
     if (result != D3D_OK)
+#pragma omp critical (error)
     {
         DWORD size = ppErrorMsgs->GetBufferSize();
         LPCSTR ErrorMsgs = reinterpret_cast<LPCSTR>(ppErrorMsgs->GetBufferPointer());
         std::string err;
         err.assign(ErrorMsgs,size);
         logger.error(0) << "Error compiling HLSL shader:" <<logger.end;
-        logger.error(0) << err << logger.end;
-    }
+		logger.error(0) << err << logger.end;
+		logger.error(0) << "Defines combination: " << logger.end;
+		for (int i = 0; i < stringCount - 1 ;++i)
+			logger.error(0) << strings[i] << logger.end;
+		logger.error(0) << logger.end;
+	}
 
     for(std::vector<D3DXMACRO>::iterator it = defines.begin();
         it != defines.end(); ++it)
@@ -117,8 +122,11 @@ HRESULT HLSLChecker::Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOI
         realPath += pFileName;
         includeCache[pFileName] = resReader.Read(realPath.c_str());
     }
-    *ppData = &includeCache[pFileName][0];
-    *pBytes = includeCache[pFileName].size();
+	*pBytes = includeCache[pFileName].size();
+	if(*pBytes != 0)
+		*ppData = &includeCache[pFileName][0];
+	else
+		*ppData = NULL;
     return S_OK;
 }
 HRESULT HLSLChecker::Close(void const *pData)
