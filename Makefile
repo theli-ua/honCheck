@@ -48,11 +48,13 @@ $(BUILD)/$(OMPTARGET): $(OMPFILES)
 clean:
 	rm -f $(OFILES) $(BUILD)/$(TARGET) $(OMPFILES) $(BUILD)/$(OMPTARGET)
 
-doc: Doxyfile $(CFILES) $(CPPFILES) $(HFILES)
+doc/html/index.html: Doxyfile $(CFILES) $(CPPFILES) $(HFILES)
 	$(ECHO) "generating documentation, it may take a time ..."
 	$(DOXYGEN) -u $^
 	$(DOXYGEN) $^
 	$(ECHO) "-> html documentation in \`doc/html'"
+
+doc: doc/html/index.html
 
 loc: $(CFILES) $(CPPFILES) $(HFILES)
 	cloc $(INCLUDES) $(SOURCES) --xsl loc.xsl --out doc/lines_of_code.xml --exclude-list-file=reused_code
