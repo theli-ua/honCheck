@@ -29,7 +29,7 @@ class GLSLChecker : public ShaderChecker
          * @param regex regular expression to match files' path
          */
         GLSLChecker(GLuint type,const char* regex);
-		~GLSLChecker();
+        ~GLSLChecker();
         std::string const& cmdOption() const;
         std::string const& name() const;
         std::string const& reString() const;
@@ -40,12 +40,14 @@ class GLSLChecker : public ShaderChecker
         std::string _regex;
         GLuint type;
 #ifdef _WIN32
-		HINSTANCE g_hInstance;
+        HINSTANCE g_hInstance;
         HWND      g_hWnd;
         HDC       g_hDC;
         HGLRC     g_hRC;
 #else
-
+        Display *dpy;
+        XVisualInfo *vi;
+        GLXContext glc;
 #endif
 };
 #endif

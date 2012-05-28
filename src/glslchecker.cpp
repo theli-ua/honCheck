@@ -33,7 +33,11 @@ static const char GLWINDOW_CLASS_NAME[] = "GLWindow_class";
 #endif
 GLSLChecker::GLSLChecker(GLuint type,const char* regex):
     type(type),_regex(regex),
+#ifdef _WIN32
 	g_hDC(NULL),g_hInstance(NULL),g_hRC(NULL),g_hWnd(NULL)
+#else
+    glc(NULL),dpy(NULL),vi(NULL)
+#endif
 {
     prologue = "#version 120\n";
     Logger& logger = Logger::get_instance();
@@ -147,14 +151,12 @@ GLSLChecker::GLSLChecker(GLuint type,const char* regex):
             OPENGL_GET_PROC(PFNGLGETSHADERINFOLOGPROC,  glGetShaderInfoLog);
         }
 #else /* #ifdef _WIN32 */
+        /* LINUX */
     if(glXGetCurrentContext() == NULL)
     {
         /* I'm not gonna render anything so minimal context creation using root window */
-        Display *dpy;
         Window root;
         GLint attr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
-        XVisualInfo *vi;
-        GLXContext glc;
 
         /* open display */
         if ( ! (dpy = XOpenDisplay(NULL)) ) {
@@ -192,23 +194,32 @@ GLSLChecker::~GLSLChecker()
 	{
 		wglMakeCurrent(NULL, NULL);
 		wglDeleteContext(g_hRC);
-		g_hRC = NULL;
 	}
 	if (g_hDC)
 	{
 		ReleaseDC(g_hWnd, g_hDC);
-		g_hDC = NULL;
 	}
 	if (g_hWnd)
 	{
 		DestroyWindow(g_hWnd);
-		g_hWnd = NULL;
 	}
 	if (g_hInstance)
 	{
 		UnregisterClass(GLWINDOW_CLASS_NAME, g_hInstance);
-		g_hInstance = NULL;
 	}
+#else
+    if(vi)
+    {
+        XFree(vi);
+    }
+    if(glc)
+    {
+        glXDestroyContext(dpy,glc);
+    }
+    if(dpy)
+    {
+        XCloseDisplay(dpy);
+    }
 #endif
 }
 std::string const& GLSLChecker::reString() const
